@@ -14,12 +14,14 @@ def test_same():
     assert not same_path([1], [1, 2])  # different length and content
     assert not same_path([1], [2, 1])  # different length and content
 
-    L = list('attacca')
+    L = list("attacca")
     assert same_path(L, L)  # uses python id to avoid work.
 
     assert same_path([1, 2], [1, 2])  # identical
     assert same_path([1, 2], [2, 1])  # same but backwards
-    assert not same_path([1, 2, 1], [2, 1, 2])  # same length, content, but different frequency.
+    assert not same_path(
+        [1, 2, 1], [2, 1, 2]
+    )  # same length, content, but different frequency.
 
 
 def test_shortest_path01():
@@ -78,13 +80,13 @@ def test_tsp():
         (1, 4),
         (1, 5),
         (1, 6),
-        (1, 7)
+        (1, 7),
     ]
 
     def _distance(a, b):
         dx = abs(a[0] - b[0])
         dy = abs(a[1] - b[1])
-        return (dx ** 2 + dy ** 2) ** (1 / 2)
+        return (dx**2 + dy**2) ** (1 / 2)
 
     # The graph must be fully connected for the TSP to work:
     for a, b in combinations(range(len(xys)), 2):
@@ -117,16 +119,30 @@ def test_tsp_perfect_problem():
     """
     g = Graph()
     xys = [
-        (0, 1), (0, 2), (0, 3), (0, 4), (0, 5),
-        (1, 5), (2, 5), (3, 5), (4, 5), (5, 5),
-        (5, 4), (5, 3), (5, 2),
-        (5, 1), (4, 1), (3, 1), (2, 1), (1, 1),
+        (0, 1),
+        (0, 2),
+        (0, 3),
+        (0, 4),
+        (0, 5),
+        (1, 5),
+        (2, 5),
+        (3, 5),
+        (4, 5),
+        (5, 5),
+        (5, 4),
+        (5, 3),
+        (5, 2),
+        (5, 1),
+        (4, 1),
+        (3, 1),
+        (2, 1),
+        (1, 1),
     ]
 
     def _distance(a, b):
         dx = abs(a[0] - b[0])
         dy = abs(a[1] - b[1])
-        return (dx ** 2 + dy ** 2) ** (1 / 2)
+        return (dx**2 + dy**2) ** (1 / 2)
 
     # The graph must be fully connected for the TSP to work:
     for a, b in combinations(range(len(xys)), 2):
@@ -154,7 +170,7 @@ def test_tsp_larger_problem():
     for a, b in combinations(xys, 2):
         dx = abs(a[0] - b[0])
         dy = abs(a[1] - b[1])
-        d = (dx ** 2 + dy ** 2) ** (1 / 2)
+        d = (dx**2 + dy**2) ** (1 / 2)
         g.add_edge(a, b, value=d)
         g.add_edge(b, a, value=d)
 
@@ -168,7 +184,7 @@ def test_tsp_larger_problem():
 def test_shortest_path_fail():
     g = graph3x3()
     d, p = g.shortest_path(start=9, end=1)  # there is no path.
-    assert d == float('inf')
+    assert d == float("inf")
     assert p == []
 
 
@@ -219,7 +235,9 @@ def test_distance_map():
 
 def test_distance_map_fail():
     g = graph3x3()
-    d = g.distance_map(starts=9)  # All edges end in 9, so the dict should contain nothing.
+    d = g.distance_map(
+        starts=9
+    )  # All edges end in 9, so the dict should contain nothing.
     assert d == {9: 0}
 
 
@@ -233,11 +251,7 @@ def test_distance_map_reverse_with_start():
     g = graph3x3()
     g.add_edge(0, 1, 1)
     d = g.distance_map(starts=[2, 4], ends=9, reverse=True)
-    assert d == {9: 0,
-                 6: 1, 8: 1,
-                 3: 2, 5: 2, 7: 2,
-                 2: 3, 4: 3,
-                 1: 4}, d
+    assert d == {9: 0, 6: 1, 8: 1, 3: 2, 5: 2, 7: 2, 2: 3, 4: 3, 1: 4}, d
     assert 0 not in d
 
 
@@ -245,16 +259,15 @@ def test_distance_map_with_starts_and_ends():
     g = graph3x3()
     g.add_edge(0, 1, 1)
     d = g.distance_map(starts=[2, 4], ends=[6, 8])
-    assert d == {2: 0, 4: 0,
-                 3: 1, 5: 1, 7: 1,
-                 6: 2, 8: 2,
-                 9: 3}, d
+    assert d == {2: 0, 4: 0, 3: 1, 5: 1, 7: 1, 6: 2, 8: 2, 9: 3}, d
     assert 0 not in d
 
 
 def test_distance_map_with_tailing_ends():
-    g = Graph(from_list=[(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1)])
-    d = g.distance_map(starts=1, ends=[3,5])
+    g = Graph(
+        from_list=[(1, 2, 1), (2, 3, 1), (3, 4, 1), (4, 5, 1), (5, 6, 1), (6, 7, 1)]
+    )
+    d = g.distance_map(starts=1, ends=[3, 5])
     assert d == {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5}, d
     assert 7 not in d
 
@@ -264,29 +277,19 @@ def test_distance_map_with_ends():
     d = g.distance_map(starts=1, ends=5)
 
     assert d[5] == 2
-    assert d == {1: 0,
-                 2: 1, 4: 1,
-                 3: 2, 5: 2, 7: 2,
-                 6: 3, 8: 3}, d
+    assert d == {1: 0, 2: 1, 4: 1, 3: 2, 5: 2, 7: 2, 6: 3, 8: 3}, d
 
 
 def test_distance_map_multiple_starts_and_ends():
     g = graph3x3()
     d = g.distance_map(starts=[1, 3], ends=[7, 9])
 
-    assert d == {1: 0, 3: 0,
-                 2: 1, 4: 1, 6: 1,
-                 5: 2, 7: 2, 9: 2,
-                 8: 3}, d
+    assert d == {1: 0, 3: 0, 2: 1, 4: 1, 6: 1, 5: 2, 7: 2, 9: 2, 8: 3}, d
 
 
 def test_shortest_tree_all_pairs01():
     g = Graph()
-    links = [
-        (1, 2, 1),
-        (1, 3, 1),
-        (2, 3, 1)
-    ]
+    links = [(1, 2, 1), (1, 3, 1), (2, 3, 1)]
     for L in links:
         g.add_edge(*L)
 
@@ -295,11 +298,7 @@ def test_shortest_tree_all_pairs01():
 
 
 def test_shortest_tree_all_pairs02():
-    links = [
-        (1, 2, 1),
-        (1, 3, 2),
-        (2, 3, 3)
-    ]
+    links = [(1, 2, 1), (1, 3, 2), (2, 3, 3)]
     g = Graph(from_list=links)
 
     for L in links:
@@ -346,13 +345,17 @@ def test_all_paths03():
     g = graph3x3()
     paths = g.all_paths(1, 9)
     assert len(paths) == 6
-    expected_result = [[1, 2, 3, 6, 9],
-                       [1, 2, 5, 6, 9],
-                       [1, 2, 5, 8, 9],
-                       [1, 4, 5, 6, 9],
-                       [1, 4, 5, 8, 9],
-                       [1, 4, 7, 8, 9]]
-    assert all(i in expected_result for i in paths) and all(i in paths for i in expected_result)
+    expected_result = [
+        [1, 2, 3, 6, 9],
+        [1, 2, 5, 6, 9],
+        [1, 2, 5, 8, 9],
+        [1, 4, 5, 6, 9],
+        [1, 4, 5, 8, 9],
+        [1, 4, 7, 8, 9],
+    ]
+    assert all(i in expected_result for i in paths) and all(
+        i in paths for i in expected_result
+    )
 
 
 def test_all_paths04():
@@ -373,20 +376,48 @@ def test_all_paths05():
     [9] <-- [8] <-- [7]
 
     """
-    links = [(1, 2), (2, 3), (3, 4), (4, 5), (4, 6), (6, 2), (6, 7), (7, 8), (8, 9), (9, 10), (10, 2)]
+    links = [
+        (1, 2),
+        (2, 3),
+        (3, 4),
+        (4, 5),
+        (4, 6),
+        (6, 2),
+        (6, 7),
+        (7, 8),
+        (8, 9),
+        (9, 10),
+        (10, 2),
+    ]
     g = Graph(from_list=[(a, b, 1) for a, b in links])
     paths = g.all_simple_paths(start=1, end=5)
     assert paths == [[1, 2, 3, 4, 5]]
 
     paths = g.all_paths(start=1, end=5)
-    expected = [[1, 2, 3, 4, 5],
-                [1, 2, 3, 4, 6, 2, 3, 4, 5],
-                [1, 2, 3, 4, 6, 7, 8, 9, 10, 2, 3, 4, 5]]
-    assert all(i in expected for i in paths) and all(i in paths for i in expected), paths
+    expected = [
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 6, 2, 3, 4, 5],
+        [1, 2, 3, 4, 6, 7, 8, 9, 10, 2, 3, 4, 5],
+    ]
+    assert all(i in expected for i in paths) and all(
+        i in paths for i in expected
+    ), paths
 
 
 def test_all_paths06():
-    links = [(1, 2), (2, 3), (3, 4), (4, 5), (4, 6), (6, 2), (6, 7), (7, 8), (8, 9), (9, 10), (10, 2)]
+    links = [
+        (1, 2),
+        (2, 3),
+        (3, 4),
+        (4, 5),
+        (4, 6),
+        (6, 2),
+        (6, 7),
+        (7, 8),
+        (8, 9),
+        (9, 10),
+        (10, 2),
+    ]
     g = Graph(from_list=[(a, b, 1) for a, b in links])
     for comb in permutations(list(range(1, 11)), 2):
         start, end = comb
@@ -412,13 +443,7 @@ def test_all_simple_paths():
 
 
 def test_dfs():
-    links = [
-        (1, 2, 0),
-        (1, 3, 0),
-        (2, 3, 0),
-        (2, 4, 0),
-        (3, 4, 0)
-    ]
+    links = [(1, 2, 0), (1, 3, 0), (2, 3, 0), (2, 4, 0), (3, 4, 0)]
     g = Graph(from_list=links)
     try:
         g.depth_first_search(0, 2)
@@ -498,7 +523,7 @@ def test_depth_scan_01():
 
 
 def test_depth_scan_02():
-    """ criteria not callable"""
+    """criteria not callable"""
     g = graph01()
 
     criteria = 41  # not callable
@@ -510,7 +535,7 @@ def test_depth_scan_02():
 
 
 def test_depth_scan_03():
-    """ start not in graph """
+    """start not in graph"""
     g = graph01()
     start_that_doesnt_exist = max(g.nodes()) + 1
 
@@ -525,7 +550,7 @@ def test_depth_scan_03():
 
 
 def test_depth_scan_04():
-    """ criteria negative on start"""
+    """criteria negative on start"""
     g = graph01()
 
     def criteria(n):
@@ -601,12 +626,16 @@ def test_cached_graph2():
     g = london_underground()
     seds = list(g.edges())
     for s, e, d in seds:
-        g.add_edge(s, e, d + s / len(seds) ** 2)  # adding minor variances so that no paths are the same length.
+        g.add_edge(
+            s, e, d + s / len(seds) ** 2
+        )  # adding minor variances so that no paths are the same length.
 
     r1 = g.shortest_path(74, 89, memoize=True)
     r2 = g.shortest_path(74, 89, memoize=True)
     assert r1 == r2, "cache call should be the same as the previous"
-    r3 = g.shortest_path(99, 89, memoize=True)  # this is a cache call as p(99,89) is in p(74,89)
+    r3 = g.shortest_path(
+        99, 89, memoize=True
+    )  # this is a cache call as p(99,89) is in p(74,89)
     assert r3 == (12.00290022249407, [99, 236, 229, 273, 107, 192, 277, 89]), r3
 
     a1, b1 = 10, 89
@@ -639,7 +668,9 @@ def test_incremental_search(tests=2000):
 
     seds = list(g.edges())
     for s, e, d in seds:
-        g.add_edge(s, e, d + s / len(seds) ** 2)  # adding minor variances so that no paths are the same length.
+        g.add_edge(
+            s, e, d + s / len(seds) ** 2
+        )  # adding minor variances so that no paths are the same length.
 
     g2 = g.copy()
 
@@ -665,8 +696,16 @@ def test_incremental_search(tests=2000):
             break
 
     pct = f"{round(100 * t_memoized / t_repeated)}" if t_repeated > 0 else "?"
-    print("repeated searches", t_repeated, "secs.",
-          "\nmemoized searches:", t_memoized, "secs.",
-          "\ntime using memoising: ", pct, "% of repeated searches",
-          flush=True)
+    print(
+        "repeated searches",
+        t_repeated,
+        "secs.",
+        "\nmemoized searches:",
+        t_memoized,
+        "secs.",
+        "\ntime using memoising: ",
+        pct,
+        "% of repeated searches",
+        flush=True,
+    )
     assert t_repeated >= t_memoized

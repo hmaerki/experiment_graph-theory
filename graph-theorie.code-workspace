@@ -4,5 +4,65 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.formatting.provider": "black",
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": false,
+		"python.linting.pylintArgs": [
+			"--rcfile=${workspaceFolder}/.pylintrc"
+		],
+		"python.linting.cwd": "${workspaceFolder}",
+		"python.linting.mypyEnabled": true,
+		"terminal.integrated.defaultProfile.windows": "Git Bash",
+		"terminal.integrated.defaultProfile.linux": "",
+		"python.testing.pytestArgs": [],
+		"python.testing.cwd": "${workspaceFolder}",
+		"python.testing.unittestEnabled": false,
+		"python.testing.pytestEnabled": true,
+		"python.linting.mypyArgs": [
+			"--config-file=${workspaceFolder}/.mypy.ini"
+		],
+		"ruff.organizeImports": true,
+		"ruff.fixAll": true,
+		"ruff.importStrategy": "fromEnvironment",
+		"ruff.args": [
+			"--config=${workspaceFolder}/.ruff.toml"
+		],
+		"[python]": {
+			"editor.defaultFormatter": "ms-python.black-formatter",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.fixAll": true,
+				"source.organizeImports": true
+			}
+		},
+		// "isort.args": [
+		// 	"--profile",
+		// 	"black"
+		// ],
+		// "base", "forest", "dark", "default", "neutral"
+		"markdown-mermaid.lightModeTheme": "base",
+		"markdown-mermaid.darkModeTheme": "dark",
+		"files.exclude": {
+			"app/ui/*.py": true,
+			"app/uic/": true,
+			"**/__pycache__/": true,
+			"**/.mypy_cache/": true,
+			"**/.pytest_cache/": true
+		},
+		"git.openRepositoryInParentFolders": "always"
+	},
+	"extensions": {
+		"recommendations": [
+			"hediet.vscode-drawio",
+			"mhutchie.git-graph",
+			"ms-python.vscode-pylance",
+			"ms-python.python",
+			"ms-python.black-formatter",
+			"ms-python.isort",
+			"github.copilot",
+			"bierner.markdown-mermaid",
+			"charliermarsh.ruff"
+		]
+	}
 }

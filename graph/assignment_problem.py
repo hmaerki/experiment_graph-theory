@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from graph import Graph
 
-__all__ = ['ap_solver', 'wtap_solver']
+__all__ = ["ap_solver", "wtap_solver"]
 
 
 def ap_solver(graph):
@@ -77,7 +77,9 @@ def ap_solver(graph):
         value_and_task_for_n.sort(reverse=True)
         for v, t in value_and_task_for_n:  # for each opportunity (in ranked order)
             d = v_null
-            for s, e, d in assignments.edges(from_node=t):  # if connected, get whoever it is connected to.
+            for s, e, d in assignments.edges(
+                from_node=t
+            ):  # if connected, get whoever it is connected to.
                 break
 
             if v > d:  # if the opportunity is better.
@@ -164,9 +166,11 @@ def wtap_solver(probabilities, weapons, target_values):
                     if w in assignments and current_engagement is not None:
                         assignments.del_edge(w, current_engagement)
                     assignments.add_edge(w, t, value=probabilities.edge(w, t))
-                effect_of_assignment[t] = _damages(probabilities=probabilities,
-                                                   assignment=assignments,
-                                                   target_values=target_values)
+                effect_of_assignment[t] = _damages(
+                    probabilities=probabilities,
+                    assignment=assignments,
+                    target_values=target_values,
+                )
 
             damage_and_targets = [(v, t) for t, v in effect_of_assignment.items()]
             damage_and_targets.sort()
@@ -178,7 +182,9 @@ def wtap_solver(probabilities, weapons, target_values):
             if current_engagement != best_alt_target:
                 if w in assignments and current_engagement is not None:
                     assignments.del_edge(w, current_engagement)
-                assignments.add_edge(w, best_alt_target, probabilities.edge(w, best_alt_target))
+                assignments.add_edge(
+                    w, best_alt_target, probabilities.edge(w, best_alt_target)
+                )
             current_target_values = effect_of_assignment[best_alt_target]
         if sum(improvements.values()) == 0:
             break
@@ -186,7 +192,7 @@ def wtap_solver(probabilities, weapons, target_values):
 
 
 def _get_current_engagement(d, assignment):
-    """ helper for WTAP solver
+    """helper for WTAP solver
     Calculates the current engagement
     :param d: device
     :param assignment: class Graph.
@@ -199,7 +205,7 @@ def _get_current_engagement(d, assignment):
 
 
 def _damages(probabilities, assignment, target_values):
-    """ helper for WTAP solver
+    """helper for WTAP solver
     :param probabilities: graph with probability of device effect on target
     :param assignment: graph with links between device and targets.
     :param target_values: dict with [target]=value.
@@ -220,7 +226,7 @@ def _damages(probabilities, assignment, target_values):
     for target, assigned_probabilities in survival_value.items():
         p = 1
         for p_ in assigned_probabilities:
-            p *= (1 - p_)
+            p *= 1 - p_
         total_survival_value += p * target_values[target]
 
     return total_survival_value

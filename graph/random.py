@@ -5,7 +5,7 @@ from graph import Graph
 
 
 def xy_distance(n1, n2):
-    """ calculates the xy_distance between to (x,y)-nodes"""
+    """calculates the xy_distance between to (x,y)-nodes"""
     x1, y1 = n1
     x2, y2 = n2
     dy, dx = (y2 - y1) * (y2 - y1), (x2 - x1) * (x2 - x1)
@@ -13,7 +13,7 @@ def xy_distance(n1, n2):
 
 
 def random_xy_graph(nodes, x_max, y_max, edges=None, seed=42):
-    """ Generates a graph with N nodes, M links, where all nodes have x,y in
+    """Generates a graph with N nodes, M links, where all nodes have x,y in
     range [1,1] to [x_max, y_max]
     :param nodes: integer
     :param x_max: integer (800 pixels for example)
@@ -23,7 +23,9 @@ def random_xy_graph(nodes, x_max, y_max, edges=None, seed=42):
     :return: Graph
     """
     if x_max * y_max < nodes:
-        raise ValueError("frame (x:{},y:{}) is too small for {} nodes".format(x_max,y_max,nodes))
+        raise ValueError(
+            "frame (x:{},y:{}) is too small for {} nodes".format(x_max, y_max, nodes)
+        )
 
     max_edges = nodes * nodes
     if edges is None:
@@ -32,7 +34,8 @@ def random_xy_graph(nodes, x_max, y_max, edges=None, seed=42):
         raise ValueError(
             "A fully connected graph with {} nodes, would at most have {} edges: {}".format(
                 nodes, max_edges, edges
-            ))
+            )
+        )
 
     random.seed(seed)
     g = Graph()
@@ -54,9 +57,9 @@ def random_xy_graph(nodes, x_max, y_max, edges=None, seed=42):
 
     # Step 2: structured search mode.
     if len(g.nodes()) < nodes:
-        x_range = list(range(1, x_max+1))
+        x_range = list(range(1, x_max + 1))
         random.shuffle(x_range)
-        y_range = list(range(1, y_max+1))
+        y_range = list(range(1, y_max + 1))
         random.shuffle(y_range)
         quit = False
         for x in x_range:

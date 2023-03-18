@@ -19,7 +19,7 @@ def test_minsum():
     stations = g.minsum()
     assert len(stations) == 1
     station_list = [g.node(s) for s in stations]
-    assert station_list == [(51.515, -0.1415, 'Oxford Circus')]
+    assert station_list == [(51.515, -0.1415, "Oxford Circus")]
 
 
 def test_minmax():
@@ -27,6 +27,8 @@ def test_minmax():
     stations = g.minmax()
     assert len(stations) == 3
     station_list = [g.node(s) for s in stations]
-    assert station_list == [(51.5226, -0.1571, 'Baker Street'),
-                            (51.5142, -0.1494, 'Bond Street'),
-                            (51.5234, -0.1466, "Regent's Park")]
+    assert station_list == [
+        (51.5226, -0.1571, "Baker Street"),
+        (51.5142, -0.1494, "Bond Street"),
+        (51.5234, -0.1466, "Regent's Park"),
+    ]

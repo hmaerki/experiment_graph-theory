@@ -12,17 +12,20 @@ a traffic scheduling problem.
 
 
 class UnSolvable(ValueError):
-    """ Value Error raised if the inputs have no solution. """
+    """Value Error raised if the inputs have no solution."""
+
     pass
 
 
 class NoSolution(ValueError):
-    """ Value Error raised if the method could not identify a valid solution """
+    """Value Error raised if the method could not identify a valid solution"""
+
     pass
 
 
 class StopCondition(Exception):
-    """ exception used to stop the search """
+    """exception used to stop the search"""
+
     pass
 
 
@@ -32,7 +35,7 @@ class Timer(object):
         :param timeout: int/float in milliseconds.
         """
         if timeout is None:
-            timeout = float('inf')
+            timeout = float("inf")
         if not isinstance(timeout, (float, int)):
             raise ValueError(f"timeout is {type(timeout)} not int or float > 0")
         if timeout < 0:
@@ -44,7 +47,7 @@ class Timer(object):
         self._expired = False
 
     def expired(self):
-        """ returns bool"""
+        """returns bool"""
         if self._expired:
             return True
 
@@ -105,16 +108,18 @@ class Load(object):
     def __eq__(self, other):
         if not isinstance(other, Load):
             raise TypeError
-        return all([
-            self.start == other.start,
-            self.ends == other.ends,
-            self.prohibited == other.prohibited
-        ])
+        return all(
+            [
+                self.start == other.start,
+                self.ends == other.ends,
+                self.prohibited == other.prohibited,
+            ]
+        )
 
 
 # helpers
 def check_user_input(graph, loads):
-    """ checks the user inputs to be valid.
+    """checks the user inputs to be valid.
 
     :param graph network available for routing.
     :param loads: dictionary or list with load id and preferred route. Examples:
@@ -159,19 +164,29 @@ def check_user_input(graph, loads):
     else:
         raise TypeError("loads not recognised. Please see docstring.")
 
-    if not all_nodes.issubset(set(graph.nodes())):  # then something is wrong. Let's analyze to help the programmer...
+    if not all_nodes.issubset(
+        set(graph.nodes())
+    ):  # then something is wrong. Let's analyze to help the programmer...
         diff = all_nodes.difference(set(graph.nodes()))
         for load in all_loads.values():
             if load.start in diff:
-                raise ValueError(f"Load {load.id}'s start ({load.start}) is not in the graph.")
+                raise ValueError(
+                    f"Load {load.id}'s start ({load.start}) is not in the graph."
+                )
             if load.ends.intersection(diff):
-                raise ValueError(f"Load {load.id}'s ends ({load.ends.intersection(diff)}) is/are not in the graph.")
+                raise ValueError(
+                    f"Load {load.id}'s ends ({load.ends.intersection(diff)}) is/are not in the graph."
+                )
             if load.prohibited.intersection(diff):
-                raise ValueError(f"Load {load.id}'s prohibited node(s) ({load.prohibited.intersection(diff)}) is/are not in the graph.")
+                raise ValueError(
+                    f"Load {load.id}'s prohibited node(s) ({load.prohibited.intersection(diff)}) is/are not in the graph."
+                )
 
-    assignment_options = {load.id: frozenset(load.ends) for load in all_loads.values() }
+    assignment_options = {load.id: frozenset(load.ends) for load in all_loads.values()}
     if not is_ap_solvable(assignment_options):
-        raise UnSolvable(f"There are not enough ends for all the loads to be assigned to a destination.")
+        raise UnSolvable(
+            "There are not enough ends for all the loads to be assigned to a destination."
+        )
 
     for load in all_loads.values():
         if load.prohibited:
@@ -185,7 +200,11 @@ def check_user_input(graph, loads):
             if node in load.ends:
                 break
         else:
-            ends = f"any {tuple(load.ends)}" if len(load.ends)>1 else f"{list(load.ends)[0]}"
+            ends = (
+                f"any {tuple(load.ends)}"
+                if len(load.ends) > 1
+                else f"{list(load.ends)[0]}"
+            )
             raise UnSolvable(f"load {load.id} has no path from {load.start} to {ends}")
     return all_loads
 
@@ -230,24 +249,30 @@ def path_to_moves(path):
     for s2 in path[1:]:
         for p1, p2 in zip(s1, s2):
             if p1 != p2:
-                moves.append({p1[0]: (p1[1], p2[1])})  # {load id: (location1, location2)}
+                moves.append(
+                    {p1[0]: (p1[1], p2[1])}
+                )  # {load id: (location1, location2)}
         s1 = s2
     return moves
 
 
 def moves_to_synchronous_moves(moves, loads):
-    """ translates the list of moves returned from the traffic jam solver to a list
+    """translates the list of moves returned from the traffic jam solver to a list
     of moves that can be made concurrently.
 
     :param moves: list of loads and moves, e.g. [{1: (2,3)}, {2:(1,2)}, ... ]
     :param loads: dict with loads and paths, e.g. {1: [2,3,4], 2: [1,2,3], ... }
     :return: list of synchronous loads and moves, e.g. [{1:(2,3), {2:(1,2}}, {1:(3,4), 2:(2,3)}, ...]
     """
-    moves = [(k,) + v for move in moves for k, v in move.items()]  # create independent copy
+    moves = [
+        (k,) + v for move in moves for k, v in move.items()
+    ]  # create independent copy
     assert isinstance(loads, dict)
     assert all(isinstance(ld, Load) for ld in loads.values())
 
-    occupied_locations = {L.start for L in loads.values()}  # loads are required in case that a load doesn't move.
+    occupied_locations = {
+        L.start for L in loads.values()
+    }  # loads are required in case that a load doesn't move.
     synchronous = []
 
     while moves:
@@ -267,9 +292,11 @@ def moves_to_synchronous_moves(moves, loads):
 
 
 class State(object):
-    def __init__(self, loads, distance=0, gradient=float('inf')):
+    def __init__(self, loads, distance=0, gradient=float("inf")):
         self.loads = loads
-        self._hash = hash(self.loads)  # by pre-calculating the hash, we save cpu time later.
+        self._hash = hash(
+            self.loads
+        )  # by pre-calculating the hash, we save cpu time later.
         self.distance = distance
         self.gradient = gradient
         self._d = None  # for most cases this isn't needed.
@@ -320,21 +347,25 @@ class JamSolver(object):
         self.loads = loads
         self.timer = timer
 
-        initial_state = State(loads=tuple((ld.id, ld.start) for ld in self.loads.values()), distance=0)
+        initial_state = State(
+            loads=tuple((ld.id, ld.start) for ld in self.loads.values()), distance=0
+        )
         self.start = initial_state
         self.ends = set()
 
         self.movements.add_node(initial_state)
 
-        self.forward_queue = [initial_state]                # this is the working queue with priority.
-        self.forward_edge = {initial_state: initial_state}  # this is a duplicate of items in the work queue
-        self.forward_visited = set()                        # we don't want to spend CPU time on this.
+        self.forward_queue = [initial_state]  # this is the working queue with priority.
+        self.forward_edge = {
+            initial_state: initial_state
+        }  # this is a duplicate of items in the work queue
+        self.forward_visited = set()  # we don't want to spend CPU time on this.
 
         self.reverse_queue = []
         self.reverse_edge = {}
         self.reverse_visited = set()
 
-        self.max_search_distance = float('inf')
+        self.max_search_distance = float("inf")
 
         self.final_states = set()
 
@@ -349,7 +380,9 @@ class JamSolver(object):
         # The closer a load is to any of it's destinations, the lower the temperature.
         # when all loads have reach a destination, the temperature is zero.
         for load_id, load in self.loads.items():
-            self.distance_maps[load_id] = self.graph.distance_map(ends=load.ends, reverse=True)
+            self.distance_maps[load_id] = self.graph.distance_map(
+                ends=load.ends, reverse=True
+            )
 
         self.done = False
         self.return_on_first = False
@@ -389,7 +422,6 @@ class JamSolver(object):
 
     def _search(self):
         while not self.timer.expired():
-
             self._find_forward_options()  # forward search
             self._find_reverse_options()  # reverse search
 
@@ -408,17 +440,23 @@ class JamSolver(object):
         for load_id, location in state:
             load = self.loads[load_id]
 
-            options = sorted((d, e) for s, e, d in self.graph.edges(from_node=location)
-                             if e not in occupied and e not in load.prohibited)
+            options = sorted(
+                (d, e)
+                for s, e, d in self.graph.edges(from_node=location)
+                if e not in occupied and e not in load.prohibited
+            )
 
             for distance, option in options:
                 new_distance_traveled = state.distance + distance
 
-                loads = tuple((lid, loc) if lid != load_id else (load_id, option) for lid, loc in state)
+                loads = tuple(
+                    (lid, loc) if lid != load_id else (load_id, option)
+                    for lid, loc in state
+                )
                 gradient = sum((self._distance(lid, loc) for lid, loc in loads))
                 new_state = State(loads, new_distance_traveled, gradient)
 
-                if self.movements.edge(state, new_state, float('inf')) < distance:
+                if self.movements.edge(state, new_state, float("inf")) < distance:
                     continue
                 else:
                     self.movements.add_edge(state, new_state, distance)
@@ -432,7 +470,10 @@ class JamSolver(object):
                     else:
                         pass
                     continue  # case is already queued for testing.
-                elif new_state in self.forward_visited or new_state in self.reverse_visited:
+                elif (
+                    new_state in self.forward_visited
+                    or new_state in self.reverse_visited
+                ):
                     continue  # seen before
                 else:
                     self.forward_edge[new_state] = new_state
@@ -442,9 +483,9 @@ class JamSolver(object):
                     self._match()
 
     def _shortest_path_multiple_ends(self):
-        """ helper that identifies the fewest number of moves required to reach any
-        of the valid end states """
-        d_min, p_min = float('inf'), None
+        """helper that identifies the fewest number of moves required to reach any
+        of the valid end states"""
+        d_min, p_min = float("inf"), None
         for end in self.final_states:
             if end in self.movements:
                 d, p = self.movements.shortest_path(self.start, end)
@@ -454,16 +495,24 @@ class JamSolver(object):
         return d_min, p_min
 
     def _match(self):
-        """ helper that updates the search queues when one finds a matching state in the other."""
+        """helper that updates the search queues when one finds a matching state in the other."""
         d, p = self._shortest_path_multiple_ends()
         self.max_search_distance = min(d, self.max_search_distance)
 
-        self.forward_visited.update({s for s in self.forward_queue if s.distance > self.max_search_distance})
-        self.forward_queue = [s for s in self.forward_queue if s.distance <= self.max_search_distance]
+        self.forward_visited.update(
+            {s for s in self.forward_queue if s.distance > self.max_search_distance}
+        )
+        self.forward_queue = [
+            s for s in self.forward_queue if s.distance <= self.max_search_distance
+        ]
         self.forward_edge = {s: s for s in self.forward_queue}
 
-        self.reverse_visited.update({s for s in self.reverse_queue if s.distance > self.max_search_distance})
-        self.reverse_queue = [s for s in self.reverse_queue if s.distance <= self.max_search_distance]
+        self.reverse_visited.update(
+            {s for s in self.reverse_queue if s.distance > self.max_search_distance}
+        )
+        self.reverse_queue = [
+            s for s in self.reverse_queue if s.distance <= self.max_search_distance
+        ]
         self.reverse_edge = {s: s for s in self.reverse_queue}
 
         if self.return_on_first:
@@ -480,17 +529,23 @@ class JamSolver(object):
         for load_id, location in state:
             load = self.loads[load_id]
 
-            options = sorted((d, s) for s, e, d in self.graph.edges(to_node=location) if
-                             s not in occupied and s not in load.prohibited)
+            options = sorted(
+                (d, s)
+                for s, e, d in self.graph.edges(to_node=location)
+                if s not in occupied and s not in load.prohibited
+            )
 
             for distance, option in options:
                 new_distance_traveled = state.distance + distance
 
-                loads = tuple((lid, loc) if lid != load_id else (load_id, option) for lid, loc in state)
+                loads = tuple(
+                    (lid, loc) if lid != load_id else (load_id, option)
+                    for lid, loc in state
+                )
                 gradient = sum((self._distance(lid, loc) for lid, loc in loads))
                 new_state = State(loads, new_distance_traveled, gradient)
 
-                if self.movements.edge(new_state, state, float('inf')) < distance:
+                if self.movements.edge(new_state, state, float("inf")) < distance:
                     continue
                 else:
                     self.movements.add_edge(new_state, state, distance)
@@ -504,7 +559,10 @@ class JamSolver(object):
                     else:
                         pass
                     continue  # case is already queued for testing.
-                elif new_state in self.reverse_visited or new_state in self.forward_visited:
+                elif (
+                    new_state in self.reverse_visited
+                    or new_state in self.forward_visited
+                ):
                     continue  # seen before
                 else:
                     self.reverse_edge[new_state] = new_state
@@ -514,7 +572,9 @@ class JamSolver(object):
                     self._match()
 
 
-def jam_solver(graph, loads, timeout=None, synchronous_moves=True, return_on_first=False):
+def jam_solver(
+    graph, loads, timeout=None, synchronous_moves=True, return_on_first=False
+):
     """
     The traffic jam solver
     - a bidirectional search algorithm that uses simulated annealing
@@ -559,10 +619,9 @@ def jam_solver(graph, loads, timeout=None, synchronous_moves=True, return_on_fir
         if timer.expired():
             raise UnSolvable(f"no solution found with timeout = {timeout} msecs")
         else:
-            raise NoSolution(f"no solution found.")
+            raise NoSolution("no solution found.")
 
     moves = path_to_moves(p)
     if synchronous_moves:
         return moves_to_synchronous_moves(moves, all_loads)
     return moves
-

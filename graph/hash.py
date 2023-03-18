@@ -4,14 +4,14 @@ from graph import Graph
 
 
 def graph_hash(graph):
-    """ Generates the top hash of the graph using sha3_256.
+    """Generates the top hash of the graph using sha3_256.
     :param graph: instance of class Graph.
     :return: graph hash (int) and graph (Graph) with hash values
     """
     assert isinstance(graph, Graph)
     hash_func = hashlib.sha3_256()
-    nodes = bytes("|".join(str(n) for n in sorted(graph.nodes())), 'utf-8')
-    edges = bytes("|".join(str(e) for e in sorted(graph.edges())), 'utf-8')
+    nodes = bytes("|".join(str(n) for n in sorted(graph.nodes())), "utf-8")
+    edges = bytes("|".join(str(e) for e in sorted(graph.edges())), "utf-8")
     hash_func.update(nodes + edges)
     return int(hash_func.hexdigest(), 16)
 
@@ -26,8 +26,8 @@ def flow_graph_hash(graph):
     assert isinstance(graph, Graph)
     sources = graph.nodes(in_degree=0)
 
-    original_hash = 'original hash'
-    new_hash = 'new_hash'
+    original_hash = "original hash"
+    new_hash = "new_hash"
     hash_graph = Graph()  # new graph with hashes.
     visited = set()
 
@@ -38,12 +38,12 @@ def flow_graph_hash(graph):
         suppliers = graph.nodes(to_node=source)
 
         hash_func = hashlib.sha3_256()
-        hash_func.update(bytes(str(source), 'utf-8'))
+        hash_func.update(bytes(str(source), "utf-8"))
         for supplier in suppliers:
             if graph.depth_first_search(start=source, end=supplier):
                 continue  # it's a cycle.
             d = hash_graph.node(supplier)
-            hash_func.update(bytes(d[new_hash], 'utf-8'))
+            hash_func.update(bytes(d[new_hash], "utf-8"))
         source_hash = hash_func.hexdigest()
 
         if source not in hash_graph:
@@ -124,7 +124,7 @@ def merkle_tree(data_blocks):
         leaves = leaves[2:]
 
         hash_func = hashlib.sha3_256()
-        hash_func.update(bytes(c1, 'utf-8') + bytes(c2, 'utf-8'))
+        hash_func.update(bytes(c1, "utf-8") + bytes(c2, "utf-8"))
         uuid = hash_func.hexdigest()
         leaves.append(uuid)
         g.add_node(node_id=uuid)

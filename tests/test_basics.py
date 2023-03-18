@@ -1,14 +1,16 @@
 from graph import Graph
-from tests.test_graph import graph3x3, graph01, graph05, graph_cycle_6, graph_cycle_5
+from tests.test_graph import graph01, graph3x3, graph05, graph_cycle_5, graph_cycle_6
 
 
 def test_to_from_dict():
-    d = {1: {2: 10, 3: 5},
-         2: {4: 1, 3: 2},
-         3: {2: 3, 4: 9, 5: 2},
-         4: {5: 4},
-         5: {1: 7, 4: 6},
-         6: {}}
+    d = {
+        1: {2: 10, 3: 5},
+        2: {4: 1, 3: 2},
+        3: {2: 3, 4: 9, 5: 2},
+        4: {5: 4},
+        5: {1: 7, 4: 6},
+        6: {},
+    }
     g = Graph()
     g.from_dict(d)
     d2 = g.to_dict()
@@ -68,13 +70,13 @@ def test_add_node_attr():
 def test_add_edge_attr():
     g = Graph()
     try:
-        g.add_edge(1, 2, {'a': 1, 'b': 2})
+        g.add_edge(1, 2, {"a": 1, "b": 2})
         raise Exception("Assignment of non-values is not supported.")
     except ValueError:
         pass
 
 
-class MyCustomHashableNode():
+class MyCustomHashableNode:
     def __init__(self, name):
         self.name = name
 
@@ -82,7 +84,7 @@ class MyCustomHashableNode():
         return hash(self.name)
 
     def __eq__(self, other):
-        """ note that without __eq__ this wont work.
+        """note that without __eq__ this wont work.
         https://stackoverflow.com/questions/9010222/why-can-a-python-dict-have-multiple-keys-with-the-same-hash?noredirect=1&lq=1
         """
         return hash(self) == hash(other)
@@ -91,13 +93,13 @@ class MyCustomHashableNode():
 def test_node_types():
     for test in [
         [1, 2, 1, 3],
-        ['A', 'B', 'A', 'C'],
-        [MyCustomHashableNode(i) for i in ['A', 'B', 'A', 'C']],
+        ["A", "B", "A", "C"],
+        [MyCustomHashableNode(i) for i in ["A", "B", "A", "C"]],
     ]:
-        a,b,c,d = test
+        a, b, c, d = test
         g = Graph()
-        g.add_edge(a,b,10)
-        g.add_edge(c,d,10)
+        g.add_edge(a, b, 10)
+        g.add_edge(c, d, 10)
         assert len(g.nodes()) == 3
 
 
@@ -187,11 +189,13 @@ def test02():
     """
     Assert that the dict loader works.
     """
-    d = {1: {2: 10, 3: 5},
-         2: {4: 1, 3: 2},
-         3: {2: 3, 4: 9, 5: 2},
-         4: {5: 4},
-         5: {1: 7, 4: 6}}
+    d = {
+        1: {2: 10, 3: 5},
+        2: {4: 1, 3: 2},
+        3: {2: 3, 4: 9, 5: 2},
+        4: {5: 4},
+        5: {1: 7, 4: 6},
+    }
     g = Graph(from_dict=d)
     assert 3 in g
     assert d[3][4] == g.edge(3, 4)
@@ -208,9 +212,10 @@ def test03():
 def test_subgraph():
     g = graph3x3()
     g2 = g.subgraph_from_nodes([1, 2, 3, 4])
-    d = {1: {2: 1, 4: 1},
-         2: {3: 1},
-         }
+    d = {
+        1: {2: 1, 4: 1},
+        2: {3: 1},
+    }
     assert g2.is_subgraph(g)
     for k, v in d.items():
         for k2, d2 in v.items():
@@ -326,20 +331,20 @@ def test_no_edge_connected():
     g = Graph()
     g.add_node(4)
     g.add_node(5)
-    assert g.is_connected(4, 5) == False
+    assert not g.is_connected(4, 5)
 
 
 def test_edge_connected():
     g = Graph()
     g.add_edge(4, 5)
-    assert g.is_connected(4, 5) == True
+    assert g.is_connected(4, 5)
 
 
 def test_edge_not_connected():
     g = Graph()
     g.add_edge(3, 4)
     g.add_edge(5, 4)
-    assert g.is_connected(3, 5) == False
+    assert not g.is_connected(3, 5)
 
 
 def test_del_edge():

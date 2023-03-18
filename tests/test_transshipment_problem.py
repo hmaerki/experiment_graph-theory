@@ -1,5 +1,9 @@
 from graph import Graph
-from graph.transshipment_problem import clondike_transshipment_problem, Train, schedule_rail_system
+from graph.transshipment_problem import (
+    clondike_transshipment_problem,
+    Train,
+    schedule_rail_system,
+)
 
 
 def test_mining_train():
@@ -14,7 +18,7 @@ def test_mining_train():
         ("L-1", "L-1-1"),
         ("L-1", "L-1-2"),  # origin, destination
         ("L-1", "L-1-3"),
-        ("L-1", "L-1-4")
+        ("L-1", "L-1-4"),
     ]
 
     mineral_deliveries = [
@@ -33,18 +37,28 @@ def test_mining_train():
     s3 = train.schedule(equipment_deliveries[:] + mineral_deliveries[:])
 
     s1_expected = [
-        ('L-1', 'L-1-1'), ('L-1', 'L-1-2'), ('L-1', 'L-1-3'), ('L-1', 'L-1-4')
+        ("L-1", "L-1-1"),
+        ("L-1", "L-1-2"),
+        ("L-1", "L-1-3"),
+        ("L-1", "L-1-4"),
     ]  # shortest jobs first.!
 
     s2_expected = [
-        ('L-1-1', 'L-1'), ('L-1-2', 'L-1'), ('L-1-3', 'L-1'), ('L-1-4', 'L-1')
+        ("L-1-1", "L-1"),
+        ("L-1-2", "L-1"),
+        ("L-1-3", "L-1"),
+        ("L-1-4", "L-1"),
     ]  # shortest job first!
 
     s3_expected = [
-        ('L-1', 'L-1-1'), ('L-1-1', 'L-1'),  # circuit 1
-        ('L-1', 'L-1-2'), ('L-1-2', 'L-1'),  # circuit 2
-        ('L-1', 'L-1-3'), ('L-1-3', 'L-1'),  # circuit 3
-        ('L-1', 'L-1-4'), ('L-1-4', 'L-1')   # circuit 4
+        ("L-1", "L-1-1"),
+        ("L-1-1", "L-1"),  # circuit 1
+        ("L-1", "L-1-2"),
+        ("L-1-2", "L-1"),  # circuit 2
+        ("L-1", "L-1-3"),
+        ("L-1-3", "L-1"),  # circuit 3
+        ("L-1", "L-1-4"),
+        ("L-1-4", "L-1"),  # circuit 4
     ]  # shortest circuit first.
 
     assert s1 == s1_expected
@@ -71,12 +85,13 @@ def test_surface_mining_equipment_delivery():
 
     assert lift_access.intersection(L1_access), "routing not possible!"
 
-    schedule_rail_system(rail_network=g, trains=[lift, level_1_train],
-                         jobs=equipment_deliveries)
+    schedule_rail_system(
+        rail_network=g, trains=[lift, level_1_train], jobs=equipment_deliveries
+    )
     s1 = level_1_train.schedule()
     s2 = lift.schedule()
 
-    s1_expected = [('L-1', 'L-1-1'), ('L-1', 'L-1-2')]
+    s1_expected = [("L-1", "L-1-1"), ("L-1", "L-1-2")]
     s2_expected = [("Surface", "L-1"), ("Surface", "L-1")]
 
     assert s1 == s1_expected
@@ -98,15 +113,9 @@ def test_double_direction_delivery():
     """
     g = clondike_transshipment_problem()
 
-    equipment_deliveries = [
-        ("Surface", "L-1-1"),
-        ("Surface", "L-1-2")
-    ]
+    equipment_deliveries = [("Surface", "L-1-1"), ("Surface", "L-1-2")]
 
-    mineral_deliveries = [
-        ("L-1-1", "Surface"),
-        ("L-1-2", "Surface")
-    ]
+    mineral_deliveries = [("L-1-1", "Surface"), ("L-1-2", "Surface")]
     lift_access = {"Surface", "L-1", "L-2"}
     lift = Train(rail_network=g, start_location="Surface", access=lift_access)
 
@@ -115,13 +124,26 @@ def test_double_direction_delivery():
 
     assert lift_access.intersection(L1_access), "routing not possible!"
 
-    schedule_rail_system(rail_network=g, trains=[lift, level_1_train],
-                         jobs=equipment_deliveries + mineral_deliveries)
+    schedule_rail_system(
+        rail_network=g,
+        trains=[lift, level_1_train],
+        jobs=equipment_deliveries + mineral_deliveries,
+    )
     s1 = level_1_train.schedule()
     s2 = lift.schedule()
 
-    s1_expected = [('L-1', 'L-1-1'), ('L-1-1', 'L-1'), ('L-1', 'L-1-2'), ('L-1-2', 'L-1')]
-    s2_expected = [('Surface', 'L-1'), ('L-1', 'Surface'), ('Surface', 'L-1'), ('L-1', 'Surface')]
+    s1_expected = [
+        ("L-1", "L-1-1"),
+        ("L-1-1", "L-1"),
+        ("L-1", "L-1-2"),
+        ("L-1-2", "L-1"),
+    ]
+    s2_expected = [
+        ("Surface", "L-1"),
+        ("L-1", "Surface"),
+        ("Surface", "L-1"),
+        ("L-1", "Surface"),
+    ]
 
     assert s1 == s1_expected
     assert s2 == s2_expected

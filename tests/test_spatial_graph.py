@@ -19,7 +19,7 @@ def spiral_graph():
 
 
 def fishbone_graph(levels=5, lengths=10, depths=2):
-    """ Creates a multi level fishbone graph.
+    """Creates a multi level fishbone graph.
 
     :param levels: int: number of levels
     :param lengths: int: number of ribs
@@ -28,7 +28,7 @@ def fishbone_graph(levels=5, lengths=10, depths=2):
     """
     g = Graph3D()
     prev_level = None
-    for level in range(1, levels+1):  # z axis.
+    for level in range(1, levels + 1):  # z axis.
         g.add_node((0, 0, level))
         if prev_level is None:
             pass
@@ -36,13 +36,13 @@ def fishbone_graph(levels=5, lengths=10, depths=2):
             g.add_edge((0, 0, prev_level), (0, 0, level), value=1, bidirectional=True)
 
         prev_spine = (0, 0, level)  # the lift.
-        for step in range(1, lengths+1):  # step along the x axis.
+        for step in range(1, lengths + 1):  # step along the x axis.
             spine = (step, 0, level)
             g.add_edge(prev_spine, spine, 1, bidirectional=True)
 
             for side in [-1, 1]:
                 rib_1 = spine
-                for depth in range(1, depths+1):
+                for depth in range(1, depths + 1):
                     rib_2 = (step, side * depth, level)
                     g.add_edge(rib_1, rib_2, 1, bidirectional=True)
                     rib_1 = rib_2
@@ -102,7 +102,7 @@ def test_path_finding():
 
 
 def test_shortest_path():
-    """ assure that the fishbone graphs entry and exits are connected. """
+    """assure that the fishbone graphs entry and exits are connected."""
     g = fishbone_graph()
     entry_point = (-1, 0, 2)
     exit_point = (-1, 0, 1)
@@ -111,7 +111,7 @@ def test_shortest_path():
 
 
 def test_no_nearest_neighbour():
-    """ checks that when you're alone, you have no neighbours."""
+    """checks that when you're alone, you have no neighbours."""
     g = Graph3D()
     xyz = (1, 1, 1)
     g.add_node(xyz)
@@ -271,7 +271,7 @@ def test_bad_config():
         pass
 
     try:
-        g.n_nearest_neighbours((1, 2, 3), n='abc')
+        g.n_nearest_neighbours((1, 2, 3), n="abc")
         raise AssertionError
     except TypeError:
         pass

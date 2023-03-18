@@ -2,7 +2,7 @@ from graph import Graph, minimum_cost_flow_using_successive_shortest_path
 
 
 def test_maximum_flow():
-    """ [2] ----- [5]
+    """[2] ----- [5]
        /    +   /  | +
     [1]      [4]   |  [7]
        +    /   +  | /
@@ -19,7 +19,7 @@ def test_maximum_flow():
         (4, 6, 10),
         (5, 6, 16),
         (5, 7, 9),
-        (6, 7, 18)
+        (6, 7, 18),
     ]
     g = Graph(from_list=edges)
 
@@ -28,7 +28,7 @@ def test_maximum_flow():
 
 
 def test_min_cut():
-    """ [2] ----- [5]
+    """[2] ----- [5]
        /    +   /  | +
     [1]      [4]   |  [7]
        +    /   +  | /
@@ -45,29 +45,23 @@ def test_min_cut():
         (4, 6, 10),
         (5, 6, 16),
         (5, 7, 9),
-        (6, 7, 18)
+        (6, 7, 18),
     ]
     g = Graph(from_list=edges)
 
-    max_flow_min_cut = g.maximum_flow_min_cut(1,7)
+    max_flow_min_cut = g.maximum_flow_min_cut(1, 7)
     assert set(max_flow_min_cut) == {(2, 5), (2, 4), (3, 4), (3, 6)}
 
 
 def test_maximum_flow01():
-    edges = [
-        (1, 2, 1)
-    ]
+    edges = [(1, 2, 1)]
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=2)
     assert flow == 1, flow
 
 
 def test_maximum_flow02():
-    edges = [
-        (1, 2, 10),
-        (2, 3, 1),  # bottleneck.
-        (3, 4, 10)
-    ]
+    edges = [(1, 2, 10), (2, 3, 1), (3, 4, 10)]  # bottleneck.
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=4)
     assert flow == 1, flow
@@ -80,7 +74,7 @@ def test_maximum_flow03():
         (2, 4, 1),  # bottleneck 1
         (3, 5, 1),  # bottleneck 2
         (4, 6, 10),
-        (5, 6, 10)
+        (5, 6, 10),
     ]
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=6)
@@ -96,7 +90,7 @@ def test_maximum_flow04():
         (3, 5, 1),  # bottleneck 3
         (3, 4, 1),  # bottleneck 4
         (4, 6, 10),
-        (5, 6, 10)
+        (5, 6, 10),
     ]
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=6)
@@ -104,11 +98,7 @@ def test_maximum_flow04():
 
 
 def test_maximum_flow05():
-    edges = [
-        (1, 2, 10),
-        (1, 3, 1),
-        (2, 3, 1)
-    ]
+    edges = [(1, 2, 10), (1, 3, 1), (2, 3, 1)]
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=3)
     assert flow == 2, flow
@@ -124,7 +114,7 @@ def test_maximum_flow06():
         (5, 6, 1),
         (5, 7, 1),
         (6, 8, 1),
-        (7, 8, 1)
+        (7, 8, 1),
     ]
     g = Graph(from_list=edges)
     flow, g2 = g.maximum_flow(start=1, end=8)
@@ -133,14 +123,16 @@ def test_maximum_flow06():
 
 
 def lecture_23_max_flow_problem():
-    """ graph and stock from https://youtu.be/UtSrgTsKUfU """
-    edges = [(1, 2, 8),
-             (1, 3, 6),
-             (2, 4, 5),
-             (2, 5, 7),
-             (3, 4, 6),
-             (3, 5, 3),
-             (4, 5, 4)]  # s,e,cost/unit
+    """graph and stock from https://youtu.be/UtSrgTsKUfU"""
+    edges = [
+        (1, 2, 8),
+        (1, 3, 6),
+        (2, 4, 5),
+        (2, 5, 7),
+        (3, 4, 6),
+        (3, 5, 3),
+        (4, 5, 4),
+    ]  # s,e,cost/unit
     g = Graph(from_list=edges)
     stock = {1: 6, 2: 0, 3: 4, 4: -5, 5: -5}  # supply > 0 > demand, stock == 0
     return g, stock
@@ -155,11 +147,7 @@ def test_minimum_cost_flow_successive_shortest_path_unlimited():
     total_cost, movements = mcf(costs, inventory)
     assert isinstance(movements, Graph)
     assert total_cost == lec_23_optimum_cost
-    expected = [
-        (1, 3, 6),
-        (3, 4, 5),
-        (3, 5, 5)
-    ]
+    expected = [(1, 3, 6), (3, 4, 5), (3, 5, 5)]
     for edge in movements.edges():
         expected.remove(edge)  # will raise error if edge is missing.
     assert expected == []  # will raise error if edge wasn't removed.
@@ -167,16 +155,14 @@ def test_minimum_cost_flow_successive_shortest_path_unlimited():
 
 def test_minimum_cost_flow_successive_shortest_path_plenty():
     costs, inventory = lecture_23_max_flow_problem()
-    capacity = Graph(from_list=[(s, e, lec_23_optimum_cost) for s, e, d in costs.edges()])
+    capacity = Graph(
+        from_list=[(s, e, lec_23_optimum_cost) for s, e, d in costs.edges()]
+    )
     mcf = minimum_cost_flow_using_successive_shortest_path
     total_cost, movements = mcf(costs, inventory, capacity)
     assert isinstance(movements, Graph)
     assert total_cost == lec_23_optimum_cost
-    expected = [
-        (1, 3, 6),
-        (3, 4, 5),
-        (3, 5, 5)
-    ]
+    expected = [(1, 3, 6), (3, 4, 5), (3, 5, 5)]
     for edge in movements.edges():
         expected.remove(edge)  # will raise error if edge is missing.
     assert expected == []  # will raise error if edge wasn't removed.
@@ -184,20 +170,16 @@ def test_minimum_cost_flow_successive_shortest_path_plenty():
 
 def test_minimum_cost_flow_successive_shortest_path_35_constrained():
     costs, inventory = lecture_23_max_flow_problem()
-    capacity = Graph(from_list=[(s, e, lec_23_optimum_cost) for s, e, d in costs.edges()])
+    capacity = Graph(
+        from_list=[(s, e, lec_23_optimum_cost) for s, e, d in costs.edges()]
+    )
     capacity.add_edge(3, 5, 4)
 
     mcf = minimum_cost_flow_using_successive_shortest_path
     total_cost, movements = mcf(costs, inventory, capacity)
     assert isinstance(movements, Graph)
     assert total_cost == lec_23_optimum_cost - 3 - 6 + 8 + 7
-    expected = [
-        (1, 3, 5),
-        (1, 2, 1),
-        (2, 5, 1),
-        (3, 5, 4),
-        (3, 4, 5)
-    ]
+    expected = [(1, 3, 5), (1, 2, 1), (2, 5, 1), (3, 5, 4), (3, 4, 5)]
     for edge in movements.edges():
         expected.remove(edge)  # will raise error if edge is missing.
     assert expected == []  # will raise error if edge wasn't removed.
@@ -210,11 +192,7 @@ def test_minimum_cost_flow_successive_shortest_path_unlimited_excess_supply():
     total_cost, movements = mcf(costs, inventory)
     assert isinstance(movements, Graph)
     assert total_cost == lec_23_optimum_cost
-    expected = [
-        (1, 3, 6),
-        (3, 4, 5),
-        (3, 5, 5)
-    ]
+    expected = [(1, 3, 6), (3, 4, 5), (3, 5, 5)]
     for edge in movements.edges():
         expected.remove(edge)  # will raise error if edge is missing.
     assert expected == []  # will raise error if edge wasn't removed.
@@ -227,35 +205,33 @@ def test_minimum_cost_flow_successive_shortest_path_unlimited_inadequate_supply(
     total_cost, movements = mcf(costs, inventory)
     assert isinstance(movements, Graph)
     assert total_cost == 6 * 6 + 10 * 3
-    expected = [
-        (1, 3, 6),
-        (3, 5, 10)
-    ]
+    expected = [(1, 3, 6), (3, 5, 10)]
     for edge in movements.edges():
         expected.remove(edge)  # will raise error if edge is missing.
     assert expected == []  # will raise error if edge wasn't removed.
 
 
 def test_min_flow_cost_problem_r4er():
-    """ example source http://www.iems.northwestern.edu/~4er/ """
-    costs = Graph(from_list=[
-        (1, 2, 12),
-        (1, 4, 12),
-        (2, 4, 10),
-        (2, 5, 9),
-        (3, 2, 13),
-        (3, 5, 7),
-        (4, 5, 4),
-        (4, 6, 8),
-        (4, 7, 6),
-        (5, 4, 3),
-        (5, 7, 9),
-        (5, 8, 13),
-        (6, 7, 7),
-        (8, 7, 3)
-    ])
+    """example source http://www.iems.northwestern.edu/~4er/"""
+    costs = Graph(
+        from_list=[
+            (1, 2, 12),
+            (1, 4, 12),
+            (2, 4, 10),
+            (2, 5, 9),
+            (3, 2, 13),
+            (3, 5, 7),
+            (4, 5, 4),
+            (4, 6, 8),
+            (4, 7, 6),
+            (5, 4, 3),
+            (5, 7, 9),
+            (5, 8, 13),
+            (6, 7, 7),
+            (8, 7, 3),
+        ]
+    )
     inventory = {1: 100, 2: 80, 3: 130, 6: -200, 7: -60, 8: -40}
     mcf = minimum_cost_flow_using_successive_shortest_path
     total_cost, movements = mcf(costs, inventory)
     assert total_cost == 5820, total_cost
-

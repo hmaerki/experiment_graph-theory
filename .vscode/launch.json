@@ -5,11 +5,81 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Black",
+      "type": "python",
+      "request": "launch",
+      "module": "black",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--target-version=py38",
+        "graph",
+        "tests",
+        "untangle"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Ruff",
+      "type": "python",
+      "request": "launch",
+      "module": "ruff",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "args": [
+        "check",
+        "."
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Mypy",
+      "type": "python",
+      "request": "launch",
+      "module": "mypy",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      // "args": ["--verbose"],
+      "justMyCode": true
+    },
+    {
+      "name": "Pylint",
+      "type": "python",
+      "request": "launch",
+      "module": "pylint",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--rcfile=${workspaceFolder}/.pylintrc",
+        "--verbose",
+        "--recursive=yes",
+        "."
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pytest",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "-s",
+        "-v"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "Python: Current File",
       "type": "python",
       "request": "launch",
       "program": "${file}",
-      "console": "integratedTerminal"
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "justMyCode": false
     }
   ]
 }

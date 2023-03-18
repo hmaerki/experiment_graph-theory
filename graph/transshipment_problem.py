@@ -80,9 +80,13 @@ def clondike_transshipment_problem():
     ]
 
     for level in [1, 2, 3, 4]:  # adding stops for the narrow gage trains in the levels.
-        paths.append(("L-{}".format(level), "L-{}-1".format(level), 1), )
+        paths.append(
+            ("L-{}".format(level), "L-{}-1".format(level), 1),
+        )
         for dig in [1, 2, 3, 4, 5, 6]:
-            paths.append(("L-{}-{}".format(level, dig), "L-{}-{}".format(level, dig + 1), 1))
+            paths.append(
+                ("L-{}-{}".format(level, dig), "L-{}-{}".format(level, dig + 1), 1)
+            )
 
     paths.extend([(n2, n1, d) for n1, n2, d in paths])  # adding the reverse path.
     g = Graph(from_list=paths)
@@ -116,8 +120,12 @@ class Train(object):
         if jobs is None:
             return self._schedule
         assert isinstance(jobs, list)
-        new_jobs = find(rail_network=self._rail_network, stops=self._access_nodes, jobs=jobs)
-        self._schedule = schedule(graph=self._rail_network, start=self._current_location, jobs=new_jobs)
+        new_jobs = find(
+            rail_network=self._rail_network, stops=self._access_nodes, jobs=jobs
+        )
+        self._schedule = schedule(
+            graph=self._rail_network, start=self._current_location, jobs=new_jobs
+        )
         return self._schedule
 
 
@@ -183,7 +191,7 @@ def schedule(graph, start, jobs):
             job_sequence = jobs_from_path(circuit_path)
         else:  # circuit not possible.
             shortest_path = []
-            shortest_distance = float('inf')
+            shortest_distance = float("inf")
             for perm in itertools.permutations(jobs_to_plan, len(jobs_to_plan)):
                 path = path_from_schedule(jobs=perm, start=start)
                 distance = graph.distance_from_path(path)
@@ -200,12 +208,12 @@ def schedule(graph, start, jobs):
 
 
 def jobs_from_path(path):
-    """ helper for finding jobs from path"""
+    """helper for finding jobs from path"""
     return [(path[i], path[i + 1]) for i in range(len(path) - 1)]
 
 
 def path_from_schedule(jobs, start):
-    """ The evaluation is based on building the travel path.
+    """The evaluation is based on building the travel path.
     For example in the network A,B,C with 4 trips as:
         1 (A,B), 2 (A,C), 3 (B,A), 4 (C,A)
     which have the travel path: [A,B,A,C,B,A,C,A]
@@ -221,7 +229,7 @@ def path_from_schedule(jobs, start):
 
 
 def find_perfect_circuit(graph, start, jobs):
-    """ A perfect circuit is a path that starts and ends at the same place
+    """A perfect circuit is a path that starts and ends at the same place
     and where every movement includes a job.
     :param: start: starting location.
     :param: jobs: list of movements [(A1,B1), (A2,B2,) ....]
@@ -242,4 +250,3 @@ def find_perfect_circuit(graph, start, jobs):
             if p:
                 return [start] + p
     return []
-

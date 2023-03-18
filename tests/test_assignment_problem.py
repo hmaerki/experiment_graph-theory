@@ -5,7 +5,7 @@ from graph.assignment_problem import ap_solver
 
 
 def test_01_taxis_and_customers():
-    """ Test where taxis are assigned to customers, so that the
+    """Test where taxis are assigned to customers, so that the
     time to travel is minimised.
 
     Note that the travel time is negative, whereby the optimal
@@ -25,7 +25,7 @@ def test_01_taxis_and_customers():
         (2, 6, -34),
         (3, 4, -22),
         (3, 5, -19),
-        (3, 6, -13)
+        (3, 6, -13),
     ]
     relationships = Graph(from_list=L)
 
@@ -60,7 +60,7 @@ def test_02_taxis_and_more_customers():
         (3, 4, -22),
         (3, 5, -19),
         (3, 6, -13),
-        (3, 7, -10)
+        (3, 7, -10),
     ]
     relationships = Graph(from_list=L)
     assignment = ap_solver(graph=relationships)

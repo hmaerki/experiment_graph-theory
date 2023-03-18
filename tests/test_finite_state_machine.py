@@ -3,25 +3,25 @@ from itertools import cycle
 
 
 def test_traffic_light():
-    green, yellow, red = 'Green', 'Yellow', 'Red'
+    green, yellow, red = "Green", "Yellow", "Red"
     seq = cycle([green, yellow, red])
     _ = next(seq)
     fsm = FiniteStateMachine()
-    fsm.add_transition(green, 'switch', yellow)
-    fsm.add_transition(yellow, 'switch', red)
-    fsm.add_transition(red, 'switch', green)
+    fsm.add_transition(green, "switch", yellow)
+    fsm.add_transition(yellow, "switch", red)
+    fsm.add_transition(red, "switch", green)
     fsm.set_initial_state(green)
     for _ in range(20):
         current_state = fsm.current_state
         new_state = next(seq)
-        fsm.next('switch')
+        fsm.next("switch")
         assert fsm.current_state == new_state, (fsm.current_state, new_state)
         assert new_state != current_state, (new_state, current_state)
 
 
 def test_turnstile():
-    locked, unlocked = 'locked', 'unlocked'  # states
-    push, coin = 'push', 'coin'  # actions
+    locked, unlocked = "locked", "unlocked"  # states
+    push, coin = "push", "coin"  # actions
     fsm = FiniteStateMachine()
     fsm.add_transition(locked, coin, unlocked)
     fsm.add_transition(unlocked, push, locked)
@@ -36,7 +36,7 @@ def test_turnstile():
 
     try:
         assert fsm._initial_state_was_set is False
-        fsm.set_initial_state('fish')
+        fsm.set_initial_state("fish")
         raise AssertionError
     except ValueError:
         pass
@@ -76,16 +76,15 @@ def test_turnstile():
 
     try:
         assert fsm._initial_state_was_set is True
-        fsm.next(action='fish')
+        fsm.next(action="fish")
         raise AssertionError
     except ValueError:
         pass
 
-    fsm.add_transition(locked, 'fire', 'fire escape mode')
-    fsm.next('fire')
+    fsm.add_transition(locked, "fire", "fire escape mode")
+    fsm.next("fire")
     try:
         fsm.next(push)
         raise AssertionError
     except StopIteration:
         pass
-

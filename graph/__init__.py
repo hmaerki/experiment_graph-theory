@@ -208,7 +208,9 @@ class BasicGraph(object):
 
         :return list of node ids.
         """
-        inputs = sum([1 for i in (from_node, to_node, in_degree, out_degree) if i is not None])
+        inputs = sum(
+            [1 for i in (from_node, to_node, in_degree, out_degree) if i is not None]
+        )
         if inputs > 1:
             m = []
             a = (from_node, to_node, in_degree, out_degree)
@@ -262,17 +264,25 @@ class BasicGraph(object):
             if len(path) < 2:
                 raise ValueError("path of length 1 is not a path.")
 
-            return [(path[ix], path[ix + 1], self._edges[path[ix]][path[ix + 1]]) for ix in range(len(path) - 1)]
+            return [
+                (path[ix], path[ix + 1], self._edges[path[ix]][path[ix + 1]])
+                for ix in range(len(path) - 1)
+            ]
 
         if from_node:
             if from_node in self._edges:
-                return [(from_node, n2, cost) for n2, cost in self._edges[from_node].items()]
+                return [
+                    (from_node, n2, cost) for n2, cost in self._edges[from_node].items()
+                ]
             else:
                 return []
 
         if to_node:
             if to_node in self._reverse_edges:
-                return [(n1, to_node, value) for n1, value in self._reverse_edges[to_node].items()]
+                return [
+                    (n1, to_node, value)
+                    for n1, value in self._reverse_edges[to_node].items()
+                ]
             else:
                 return []
 
@@ -463,9 +473,13 @@ def breadth_first_walk(graph, start, end=None, reversed_walk=False):
     if start not in graph:
         raise ValueError(f"{start} not in graph")
     if end is not None and end not in graph:
-        raise ValueError(f"{end} not in graph. Use `end=None` if you want exhaustive search.")
+        raise ValueError(
+            f"{end} not in graph. Use `end=None` if you want exhaustive search."
+        )
     if not isinstance(reversed_walk, bool):
-        raise TypeError(f"reversed_walk should be boolean, not {type(reversed_walk)}: {reversed_walk}")
+        raise TypeError(
+            f"reversed_walk should be boolean, not {type(reversed_walk)}: {reversed_walk}"
+        )
 
     visited = {start: None}
     q = deque([start])
@@ -474,7 +488,11 @@ def breadth_first_walk(graph, start, end=None, reversed_walk=False):
         yield node
         if node == end:
             break
-        L = graph.nodes(from_node=node) if not reversed_walk else graph.nodes(to_node=node)
+        L = (
+            graph.nodes(from_node=node)
+            if not reversed_walk
+            else graph.nodes(to_node=node)
+        )
         for next_node in L:
             if next_node not in visited:
                 visited[next_node] = node
@@ -517,7 +535,9 @@ def distance_map(graph, starts=None, ends=None, reverse=False):
         ends = {ends}
     if any(end not in graph for end in ends if end is not None):
         missing = [end not in graph for end in ends if end is not None]
-        raise ValueError(f"{missing} not in graph. Use `end=None` if you want exhaustive search.")
+        raise ValueError(
+            f"{missing} not in graph. Use `end=None` if you want exhaustive search."
+        )
 
     if not reverse:
         ends_found = set()
@@ -704,7 +724,9 @@ def maximum_flow(graph, start, end):
 
     inflow = sum(d for s, e, d in graph.edges(from_node=start))
     outflow = sum(d for s, e, d in graph.edges(to_node=end))
-    unassigned_flow = min(inflow, outflow)  # search in excess of this 'flow' is a waste of time.
+    unassigned_flow = min(
+        inflow, outflow
+    )  # search in excess of this 'flow' is a waste of time.
     total_flow = 0
     # -----------------------------------------------------------------------
     # The algorithm
@@ -740,7 +762,12 @@ def maximum_flow(graph, start, end):
             return total_flow, flow_graph
         # else: use the path and lookup the actual flow from the capacity graph.
 
-        path_flow = min([min(d, capacity_graph.edge(s, e, default=float("inf"))) for s, e, d in graph.edges(path=path)])
+        path_flow = min(
+            [
+                min(d, capacity_graph.edge(s, e, default=float("inf")))
+                for s, e, d in graph.edges(path=path)
+            ]
+        )
 
         # 2. update the unassigned flow.
         unassigned_flow -= path_flow
@@ -750,7 +777,6 @@ def maximum_flow(graph, start, end):
         #    ready for the next iteration.
         edges = graph.edges(path)
         for n1, n2, d in edges:
-
             # 3.a. recording:
             v = flow_graph.edge(n1, n2, default=None)
             if v is None:
@@ -836,7 +862,9 @@ def minimum_cost_flow_using_successive_shortest_path(costs, inventory, capacity=
         if any(d < 0 for s, e, d in capacity.edges()):
             nn = [(s, e) for s, e, d in capacity.edges() if d < 0]
             raise ValueError(f"negative capacity on edges: {nn}")
-        if {(s, e) for s, e, d in costs.edges()} != {(s, e) for s, e, d in capacity.edges()}:
+        if {(s, e) for s, e, d in costs.edges()} != {
+            (s, e) for s, e, d in capacity.edges()
+        }:
             raise ValueError("cost and capacity have different links")
 
     # successive shortest path algorithm begins ...
@@ -846,7 +874,9 @@ def minimum_cost_flow_using_successive_shortest_path(costs, inventory, capacity=
     flows = Graph()  # initialise F as copy with zero flow
     capacities = Graph()  # initialise C as a copy of capacity, so used capacity
     # can be removed.
-    balance = [(v, k) for k, v in inventory.items() if v != 0]  # list with excess/demand, node id
+    balance = [
+        (v, k) for k, v in inventory.items() if v != 0
+    ]  # list with excess/demand, node id
     balance.sort()
 
     distances = paths.all_pairs_shortest_paths()
@@ -869,10 +899,15 @@ def minimum_cost_flow_using_successive_shortest_path(costs, inventory, capacity=
         if dist == float("inf"):
             raise Exception("bad logic: Case not checked for.")
 
-        cost, path = paths.shortest_path(En, Dn)  # compute shortest path P from E to a node in demand D.
+        cost, path = paths.shortest_path(
+            En, Dn
+        )  # compute shortest path P from E to a node in demand D.
 
         # determine the capacity limit C on P:
-        capacity_limit = min(capacities.edge(s, e, default=capacity.edge(s, e)) for s, e in zip(path[:-1], path[1:]))
+        capacity_limit = min(
+            capacities.edge(s, e, default=capacity.edge(s, e))
+            for s, e in zip(path[:-1], path[1:])
+        )
 
         # determine L units to be transferred as min(demand @ D and the limit C)
         L = min(E, abs(D), capacity_limit)
@@ -911,7 +946,6 @@ def tsp_branch_and_bound(graph):
         L = []
         edges = set()
         for n in nodes:
-
             L2 = [(d, e) for s, e, d in graph.edges(from_node=n) if e in nodes - {n}]
             if not L2:
                 continue
@@ -946,7 +980,7 @@ def tsp_branch_and_bound(graph):
             ),  # locations visited.
         )
 
-    hit, switch, q2 = 0, True, []
+    hit, _switch, q2 = 0, True, []
     while q:  # walk the tree.
         d, _, tour = q.pop(0)
         tour_set = set(tour)
@@ -964,7 +998,6 @@ def tsp_branch_and_bound(graph):
         remaining_nodes = all_nodes - tour_set
 
         for n2 in remaining_nodes:
-
             new_tour = tour + (n2,)
 
             lb_set = remaining_nodes - {n2}
@@ -1033,10 +1066,17 @@ def tsp_greedy(graph):
         n = len(tour)
 
         # Return (i, j) pairs denoting tour[i:j] sub_segments of a tour of length N.
-        sub_segments = [(i, i + length) for length in reversed(range(2, n)) for i in reversed(range(n - length + 1))]
+        sub_segments = [
+            (i, i + length)
+            for length in reversed(range(2, n))
+            for i in reversed(range(n - length + 1))
+        ]
 
         while True:
-            improvements = {reverse_segment_if_improvement(graph, tour, i, j) for (i, j) in sub_segments}
+            improvements = {
+                reverse_segment_if_improvement(graph, tour, i, j)
+                for (i, j) in sub_segments
+            }
             if improvements == {None} or len(improvements) == 0:
                 return tour
 
@@ -1045,7 +1085,12 @@ def tsp_greedy(graph):
         # Given tour [...A,B...C,D...], consider reversing B...C to get [...A,C...B,D...]
         a, b, c, d = tour[i - 1], tour[i], tour[j - 1], tour[j % len(tour)]
         # are old links (ab + cd) longer than new ones (ac + bd)? if so, reverse segment.
-        A, B, C, D = graph.edge(a, b), graph.edge(c, d), graph.edge(a, c), graph.edge(b, d)
+        A, B, C, D = (
+            graph.edge(a, b),
+            graph.edge(c, d),
+            graph.edge(a, c),
+            graph.edge(b, d),
+        )
         # if all are not None and improvement is shorter than previous ...
         if all((A, B, C, D)) and A + B > C + D:
             tour[i:j] = reversed(tour[i:j])  # ..retain the solution.
@@ -1072,7 +1117,9 @@ def tsp_greedy(graph):
 
     second_path_length = tsp_tour_length(graph, improved_tour)
 
-    assert first_path_length >= second_path_length, "first path was better than improved tour?! {} {}".format(
+    assert (
+        first_path_length >= second_path_length
+    ), "first path was better than improved tour?! {} {}".format(
         first_path_length, second_path_length
     )
 
@@ -1203,8 +1250,12 @@ def components(graph):
         while new_nodes:
             n = new_nodes.pop()
             new_component.add(n)
-            new_nodes.update(set(n for n in graph.nodes(from_node=n) if n not in new_component))
-            new_nodes.update(set(n for n in graph.nodes(to_node=n) if n not in new_component))
+            new_nodes.update(
+                set(n for n in graph.nodes(from_node=n) if n not in new_component)
+            )
+            new_nodes.update(
+                set(n for n in graph.nodes(to_node=n) if n not in new_component)
+            )
         nodes = nodes - new_component
     return sets_of_components
 
@@ -1224,7 +1275,9 @@ def network_size(graph, n1, degrees_of_separation=None):
 
     if degrees_of_separation is not None:
         if not isinstance(degrees_of_separation, int):
-            raise TypeError(f"Expected degrees_of_separation to be integer, not {type(degrees_of_separation)}")
+            raise TypeError(
+                f"Expected degrees_of_separation to be integer, not {type(degrees_of_separation)}"
+            )
 
     network = {n1}
     q = set(graph.nodes(from_node=n1))
@@ -1335,7 +1388,6 @@ def phase_lines(graph):
                 sinks[e].discard(s)
                 # but also check if their descendants are loops.
                 for s2 in list(sinks[e]):
-
                     con = cache.get((e, s2))  # check if the edge has been seen before.
                     if con is None:
                         con = graph.is_connected(e, s2)  # if not seen before, search...
@@ -1391,7 +1443,10 @@ def same_path(path1, path2):
         return False
 
     starts = (ix for ix, n2 in enumerate(path2) if path1[0] == n2)
-    return any(all(a == b for a, b in zip(path1, chain(path2[start:], path2[:start]))) for start in starts)
+    return any(
+        all(a == b for a, b in zip(path1, chain(path2[start:], path2[:start])))
+        for start in starts
+    )
 
 
 def adjacency_matrix(graph):
@@ -1422,7 +1477,10 @@ def adjacency_matrix(graph):
         raise TypeError(f"Expected BasicGraph, Graph or Graph3D, not {type(graph)}")
 
     return {
-        v1: {v2: 0 if v1 == v2 else graph.edge(v1, v2, default=float("inf")) for v2 in graph.nodes()}
+        v1: {
+            v2: 0 if v1 == v2 else graph.edge(v1, v2, default=float("inf"))
+            for v2 in graph.nodes()
+        }
         for v1 in graph.nodes()
     }
 
@@ -1464,7 +1522,10 @@ def all_pairs_shortest_paths(graph):
     vertices = g.keys()
 
     for v2 in vertices:
-        g = {v1: {v3: min(g[v1][v3], g[v1][v2] + g[v2][v3]) for v3 in vertices} for v1 in vertices}
+        g = {
+            v1: {v3: min(g[v1][v3], g[v1][v2] + g[v2][v3]) for v3 in vertices}
+            for v1 in vertices
+        }
     return g
 
 
@@ -1630,7 +1691,10 @@ def all_paths(graph, start, end):
                 for n3 in n3s:
                     for path in new_paths:
                         a = [n2, n3]
-                        if any(all(path[i + j] == a[j] for j in range(len(a))) for i in range(len(path))):
+                        if any(
+                            all(path[i + j] == a[j] for j in range(len(a)))
+                            for i in range(len(path))
+                        ):
                             skip_list.add(n3)
 
             for path in new_paths:
@@ -1773,7 +1837,9 @@ class BiDirectionalSearch(object):
 
         self.boundary.add(st.n1)
 
-        if st.n1 in other.boundary:  # if there's an intercept between the two searches ...
+        if (
+            st.n1 in other.boundary
+        ):  # if there's an intercept between the two searches ...
             if st.cost + other.mins[st.n1] < self.sp_length:
                 sp_length = st.cost + other.mins[st.n1]
                 if self.direction == self.forward:
@@ -1784,15 +1850,25 @@ class BiDirectionalSearch(object):
                 self.q = [a for a in self.q if a.cost < sp_length]
 
         if self.direction == self.forward:
-            edges = sorted((d, e) for s, e, d in self.graph.edges(from_node=st.n1) if e not in self.avoids)
+            edges = sorted(
+                (d, e)
+                for s, e, d in self.graph.edges(from_node=st.n1)
+                if e not in self.avoids
+            )
         else:
-            edges = sorted((d, s) for s, e, d in self.graph.edges(to_node=st.n1) if s not in self.avoids)
+            edges = sorted(
+                (d, s)
+                for s, e, d in self.graph.edges(to_node=st.n1)
+                if s not in self.avoids
+            )
 
         for dist, n2 in edges:
             n2_dist = st.cost + dist
             if n2_dist > self.sp_length:  # no point pursuing as the solution is worse.
                 continue
-            if n2 in other.mins and n2_dist + other.mins[n2] > self.sp_length:  # already longer than lower bound.
+            if (
+                n2 in other.mins and n2_dist + other.mins[n2] > self.sp_length
+            ):  # already longer than lower bound.
                 continue
 
             # at this point we can't dismiss that n2 will lead to a better solution, so we retain it.
@@ -1883,8 +1959,12 @@ def shortest_path_bidirectional(graph, start, end, avoids=None):
     if end not in graph:
         raise ValueError("end not in graph.")
 
-    forward = BiDirectionalSearch(graph, start=start, direction=BiDirectionalSearch.forward, avoids=avoids)
-    backward = BiDirectionalSearch(graph, start=end, direction=BiDirectionalSearch.backward, avoids=avoids)
+    forward = BiDirectionalSearch(
+        graph, start=start, direction=BiDirectionalSearch.forward, avoids=avoids
+    )
+    backward = BiDirectionalSearch(
+        graph, start=end, direction=BiDirectionalSearch.backward, avoids=avoids
+    )
 
     while any((forward.q, backward.q)):
         forward.search(other=backward)
@@ -1943,7 +2023,9 @@ class ShortestPathCache(object):
         if avoids is None:
             pass
         elif not isinstance(avoids, (frozenset, set, list)):
-            raise TypeError(f"Expect obstacles as None, set or frozenset, not {type(avoids)}")
+            raise TypeError(
+                f"Expect obstacles as None, set or frozenset, not {type(avoids)}"
+            )
         else:
             avoids = frozenset(avoids)
 
@@ -1957,7 +2039,9 @@ class ShortestPathCache(object):
             hash_key = hash(avoids)
             d, p = self.repeated_cache.get((start, end, hash_key), (None, None))
             if d is None:
-                d, p = shortest_path_bidirectional(self.graph, start, end, avoids=avoids)
+                d, p = shortest_path_bidirectional(
+                    self.graph, start, end, avoids=avoids
+                )
                 self.repeated_cache[(start, end, hash_key)] = (d, p)
         else:
             if d is None:  # is it cached?
@@ -2022,7 +2106,9 @@ class Graph(BasicGraph):
         :param reversed_walk: if True, the BFS walk is backwards.
         :return: generator for breadth-first walk
         """
-        return breadth_first_walk(graph=self, start=start, end=end, reversed_walk=reversed_walk)
+        return breadth_first_walk(
+            graph=self, start=start, end=end, reversed_walk=reversed_walk
+        )
 
     def distance_map(self, starts=None, ends=None, reverse=False):
         """Maps the shortest path distance from any start to any end.
@@ -2088,7 +2174,9 @@ class Graph(BasicGraph):
         :param capacity: None or Graph with `capacity` as edge.
         :return: total costs, graph of flows in solution.
         """
-        return minimum_cost_flow_using_successive_shortest_path(self, inventory, capacity)
+        return minimum_cost_flow_using_successive_shortest_path(
+            self, inventory, capacity
+        )
 
     def solve_tsp(self, method="greedy"):
         """solves the traveling salesman problem for the graph
@@ -2346,7 +2434,14 @@ class Graph3D(Graph):
 class Task(object):
     """Helper for critical path method"""
 
-    __slots__ = ["task_id", "duration", "earliest_start", "earliest_finish", "latest_start", "latest_finish"]
+    __slots__ = [
+        "task_id",
+        "duration",
+        "earliest_start",
+        "earliest_finish",
+        "latest_start",
+        "latest_finish",
+    ]
 
     def __init__(
         self,
@@ -2451,10 +2546,14 @@ def critical_path(graph):
         predecessors = [d[t] for t in graph.nodes(to_node=task_id)]
         duration = graph.node(task_id)
         if not isinstance(duration, (float, int)):
-            raise ValueError(f"Expected task {task_id} to have a numeric duration, but got {type(duration)}")
+            raise ValueError(
+                f"Expected task {task_id} to have a numeric duration, but got {type(duration)}"
+            )
         t = Task(task_id=task_id, duration=duration)
         # 1. the earliest start and earliest finish is determined in topological order.
-        t.earliest_start = max(t.earliest_finish for t in predecessors) if predecessors else 0
+        t.earliest_start = (
+            max(t.earliest_finish for t in predecessors) if predecessors else 0
+        )
         t.earliest_finish = t.earliest_start + t.duration
         d[task_id] = t
         # 2. the path length is recorded.
@@ -2464,7 +2563,11 @@ def critical_path(graph):
         successors = [d[t] for t in graph.nodes(from_node=task_id)]
         t = d[task_id]
         # 1. the latest start and finish is determined in reverse topological order
-        t.latest_finish = min(t.latest_start for t in successors) if successors else critical_path_length
+        t.latest_finish = (
+            min(t.latest_start for t in successors)
+            if successors
+            else critical_path_length
+        )
         t.latest_start = t.latest_finish - t.duration
 
     return critical_path_length, d
@@ -2483,8 +2586,12 @@ def critical_path_minimize_for_slack(graph):
     phases = phase_lines(graph)
 
     new_graph = graph.copy()
-    slack_nodes = [t for k, t in schedule.items() if t.slack > 0]  # slack == 0 is on the critical path.
-    slack_nodes.sort(reverse=True, key=lambda t: t.slack)  # most slack on top as it has more freedom to move.
+    slack_nodes = [
+        t for k, t in schedule.items() if t.slack > 0
+    ]  # slack == 0 is on the critical path.
+    slack_nodes.sort(
+        reverse=True, key=lambda t: t.slack
+    )  # most slack on top as it has more freedom to move.
     slack_node_ids = [t.task_id for t in slack_nodes]
     slack = sum(t.slack for t in schedule.values())
 
@@ -2504,7 +2611,6 @@ def critical_path_minimize_for_slack(graph):
             and new_graph.edge(n2, n1) is None  # ...downstream
             and new_graph.edge(n1, n2) is None  # ... not creating a cycle.
         ):  # ... not already a dependency.
-
             new_graph.add_edge(n1, n2)
             new_edges.append((n1, n2))
 

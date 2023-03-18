@@ -3,9 +3,11 @@ from graph import Graph
 
 
 def test_bad_input():
-    g = Graph(from_list=[
-        (0, 1, 1),  # 3 edges:
-    ])
+    g = Graph(
+        from_list=[
+            (0, 1, 1),  # 3 edges:
+        ]
+    )
     try:
         _ = plot_2d(g)
         raise AssertionError
@@ -14,9 +16,11 @@ def test_bad_input():
 
 
 def test_bad_input1():
-    g = Graph(from_list=[
-        ((1,), (0, 1), 1),
-    ])
+    g = Graph(
+        from_list=[
+            ((1,), (0, 1), 1),
+        ]
+    )
     try:
         _ = plot_2d(g)
         raise AssertionError
@@ -25,9 +29,11 @@ def test_bad_input1():
 
 
 def test_bad_input2():
-    g = Graph(from_list=[
-        ((1, 2), ('a', 'b'), 1),
-    ])
+    g = Graph(
+        from_list=[
+            ((1, 2), ("a", "b"), 1),
+        ]
+    )
     try:
         _ = plot_2d(g)
         raise AssertionError
@@ -36,12 +42,9 @@ def test_bad_input2():
 
 
 def test_bad_input3():
-    g = Graph(from_list=[
-        ((1, 'b'), ('b', 1), 1)
-    ])
+    g = Graph(from_list=[((1, "b"), ("b", 1), 1)])
     try:
         _ = plot_2d(g)
         raise AssertionError
     except (ValueError, ImportError):
         pass
-

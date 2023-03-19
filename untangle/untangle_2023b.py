@@ -1,7 +1,4 @@
 import dataclasses
-import math
-import time
-import typing
 from typing import Dict, FrozenSet, List, Set
 
 import matplotlib
@@ -95,7 +92,23 @@ class PathCollector:
         """
         current_path: Set[NodeAttr] = set()
 
-        def recurse(start_node: NodeAttr, node: NodeAttr):
+        def is_superpath(current_path: FrozenSet[NodeAttr]) -> bool:
+            """
+            return if 'current_path' is embracing a smaller path.
+            """
+            if len(current_path) < 4:
+                # This path is to short to be able to embrace another path
+                return False
+            for path in self.path_set:
+                if path.issubset(current_path):
+                    # dropped
+                    # print(
+                    #     f"DROPPED: {text_path(path)} contains {text_path(current_path)}"
+                    # )
+                    return True
+            return False
+
+        def recurse(path_len: int, start_node: NodeAttr, node: NodeAttr):
             current_path.add(node)
             # for next_node in sorted(g.nodes(from_node=node)):
             for edge in sorted(g.edges(from_node=node)):
@@ -106,6 +119,8 @@ class PathCollector:
                     pass
                 if next_node is start_node:
                     if len(current_path) > 2:
+                        if is_superpath(current_path=current_path):
+                            continue
                         self.path_set.add(frozenset(current_path))
                         # print("new closed path", text_path(current_path))
                     # else:
@@ -121,17 +136,26 @@ class PathCollector:
                     # else:
                     #     print("Already in set")
                     continue
-                recurse(start_node=start_node, node=next_node)
+                if len(current_path) >= path_len:
+                    continue
+                recurse(path_len=path_len, start_node=start_node, node=next_node)
             current_path.remove(node)
 
-        for start_node in sorted(g.nodes()):
-            # print(start_node)
-            recurse(start_node=start_node, node=start_node)
+        node_count = len(g.nodes())
+        # for path_len in range(3, node_count+ 1):
+        for path_len in range(3, 5):
+            for start_node in sorted(g.nodes()):
+                # print(start_node)
+                recurse(path_len=path_len, start_node=start_node, node=start_node)
 
-    def print_paths(self) -> None:
+    def smallest_paths(self) -> Set[FrozenSet[NodeAttr]]:
+        pass
+
+    @staticmethod
+    def print_paths(path_set: Set[FrozenSet[NodeAttr]]) -> None:
         print("------")
         l: List[str] = []
-        for path in self.path_set:
+        for path in path_set:
             l.append(text_path(path))
         for p in sorted(l):
             print(p)
@@ -144,7 +168,7 @@ def text_path(path: Set[NodeAttr]) -> str:
 def collect_path(g: Graph):
     pc = PathCollector()
     pc.iter_path(g=g)
-    pc.print_paths()
+    PathCollector.print_paths(pc.path_set)
     # for path in iter_path(g=g):
     # print(sorted(path))
 
@@ -159,6 +183,6 @@ def doit(str_game: str = STR_GAME_10A):
 
 if __name__ == "__main__":
     doit(STR_GAME_6A)
-    # doit(STR_GAME_20A)
     # doit(STR_GAME_10A)
+    # doit(STR_GAME_20A)
     # doit(STR_GAME_100A)

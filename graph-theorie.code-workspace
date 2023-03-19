@@ -54,7 +54,7 @@
 	},
 	"extensions": {
 		"recommendations": [
-			"hediet.vscode-drawio",
+			// "hediet.vscode-drawio",
 			"mhutchie.git-graph",
 			"ms-python.vscode-pylance",
 			"ms-python.python",
